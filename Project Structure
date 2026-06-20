@@ -1,12 +1,9 @@
-ai-workforce-planning/
+AI-Enabled-Workforce-Capacity-Planning/
 
 │
 ├── app.py
 ├── workforce_model.py
 ├── requirements.txt
 │
-├── data/
-│   └── workforce_input.csv
-│
-└── .streamlit/
-    └── config.toml
+└── data/
+    └── workforce_input.csv
