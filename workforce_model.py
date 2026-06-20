@@ -11,14 +11,18 @@ ANNUAL_CAPACITY = (
     * MONTHS_PER_YEAR
 )
 
-ATTRITION_RATE = 0.08
 
-
-def calculate_workforce(df, bau_growth, dc_growth):
+def calculate_workforce(
+        df,
+        bau_growth,
+        dc_growth,
+        attrition):
 
     results = []
 
     for _, row in df.iterrows():
+
+        # Current Workload
 
         current_hours = (
             row["Breakdown_WO"] * row["Breakdown_Hrs"]
@@ -26,16 +30,33 @@ def calculate_workforce(df, bau_growth, dc_growth):
             + row["Startup_WO"] * row["Startup_Hrs"]
         )
 
-        future_hours = current_hours * (
-            1 + bau_growth/100 + dc_growth/100
+        # Future workload
+
+        growth_factor = (
+            1
+            + (bau_growth / 100)
+            + (dc_growth / 100)
         )
 
-        required_engineers = future_hours / ANNUAL_CAPACITY
+        future_hours = (
+            current_hours * growth_factor
+        )
+
+        # Engineers required
+
+        required_engineers = (
+            future_hours /
+            ANNUAL_CAPACITY
+        )
+
+        # Attrition adjustment
 
         available_engineers = (
             row["Current_SE"]
-            * (1 - ATTRITION_RATE)
+            * (1 - attrition / 100)
         )
+
+        # Hiring Gap
 
         additional_required = max(
             math.ceil(
@@ -46,13 +67,28 @@ def calculate_workforce(df, bau_growth, dc_growth):
         )
 
         results.append({
-            "Region": row["Region"],
-            "Product": row["Product"],
-            "Current Hours": round(current_hours),
-            "Future Hours": round(future_hours),
-            "Required Engineers": round(required_engineers,1),
-            "Available Engineers": round(available_engineers,1),
-            "Additional Required": additional_required
+
+            "Region":
+                row["Region"],
+
+            "Product":
+                row["Product"],
+
+            "Current Hours":
+                round(current_hours),
+
+            "Future Hours":
+                round(future_hours),
+
+            "Required Engineers":
+                round(required_engineers, 1),
+
+            "Available Engineers":
+                round(available_engineers, 1),
+
+            "Additional Required":
+                additional_required
+
         })
 
     return pd.DataFrame(results)
