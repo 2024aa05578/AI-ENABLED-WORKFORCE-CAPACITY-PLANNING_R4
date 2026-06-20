@@ -1,9 +1,8 @@
-AI-Enabled-Workforce-Capacity-Planning/
-
+AI-Enabled-Workforce-Capacity-Planning
 │
 ├── app.py
 ├── workforce_model.py
 ├── requirements.txt
 │
-└── data/
+└── data
     └── workforce_input.csv
