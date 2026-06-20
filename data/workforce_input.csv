@@ -1,5 +1,26 @@
 Region,Product,Current_IB,Breakdown_WO,PM_WO,Startup_WO,Breakdown_Hrs,PM_Hrs,Startup_Hrs,Current_SE
-North,UPS,5000,600,1200,200,5,2,8,30
-South,UPS,4500,500,1000,180,5,2,8,28
-West,Cooling,8000,900,2200,400,6,3,10,45
-East,Power Products,2000,300,500,50,4,2,6,12
+
+North,UPS,5695,15038,3000,2223,5,2,8,33
+West,UPS,6219,12442,4355,4808,5,2,8,41
+South,UPS,8830,18567,4085,5375,5,2,8,54
+East,UPS,1322,2411,362,508,5,2,8,9
+
+North,Cooling,3873,3035,607,799,6,3,10,9
+West,Cooling,5094,499,1750,3650,6,3,10,14
+South,Cooling,4524,1342,295,2405,6,3,10,16
+East,Cooling,1910,927,139,433,6,3,10,5
+
+North,Power Products,1354,585,203,89,4,2,6,7
+West,Power Products,1242,2397,719,347,4,2,6,8
+South,Power Products,380,1242,248,380,4,2,6,6
+East,Power Products,213,435,65,213,4,2,6,3
+
+North,Power System,547,711,82,1656,5,2,8,14
+West,Power System,668,668,200,3403,5,2,8,21
+South,Power System,1936,1353,271,1936,5,2,8,31
+East,Power System,1247,876,175,1247,5,2,8,15
+
+North,Industrial Automation,607,912,91,82,4,2,6,2
+West,Industrial Automation,951,951,285,95,4,2,6,3
+South,Industrial Automation,126,494,99,126,4,2,6,1
+East,Industrial Automation,161,179,27,161,4,2,6,1
