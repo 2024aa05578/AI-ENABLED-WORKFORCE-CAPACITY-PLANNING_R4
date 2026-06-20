@@ -2,9 +2,9 @@ import streamlit as st
 import pandas as pd
 from workforce_model import calculate_workforce
 
-# -------------------------------------------------
-# PAGE CONFIGURATION
-# -------------------------------------------------
+# --------------------------------------------------
+# PAGE SETUP
+# --------------------------------------------------
 
 st.set_page_config(
     page_title="AI Enabled Workforce & Capacity Planning",
@@ -12,66 +12,107 @@ st.set_page_config(
     layout="wide"
 )
 
-# -------------------------------------------------
+# --------------------------------------------------
 # SIDEBAR
-# -------------------------------------------------
+# --------------------------------------------------
 
-st.sidebar.header("Growth Parameters")
+st.sidebar.title("BU Wise Planning Parameters")
 
-bau_growth = st.sidebar.slider(
-    "BAU Growth %",
-    0,
-    100,
-    20
-)
+bus = [
+    "UPS",
+    "Cooling",
+    "Power Products",
+    "Power System",
+    "Industrial Automation"
+]
 
-dc_growth = st.sidebar.slider(
-    "Data Center Surge %",
-    0,
-    100,
-    35
-)
+bu_parameters = {}
 
-attrition = st.sidebar.slider(
-    "Attrition %",
-    0,
-    30,
-    8
-)
+for bu in bus:
 
-# -------------------------------------------------
-# MAIN SCREEN
-# -------------------------------------------------
+    st.sidebar.subheader(bu)
+
+    bau = st.sidebar.slider(
+        f"{bu} BAU Growth %",
+        0,
+        100,
+        20,
+        key=f"bau_{bu}"
+    )
+
+    dc = st.sidebar.slider(
+        f"{bu} Data Center Surge %",
+        0,
+        100,
+        20,
+        key=f"dc_{bu}"
+    )
+
+    attr = st.sidebar.slider(
+        f"{bu} Attrition %",
+        0,
+        30,
+        8,
+        key=f"attr_{bu}"
+    )
+
+    bu_parameters[bu] = {
+        "BAU": bau,
+        "DC": dc,
+        "Attrition": attr
+    }
+
+# --------------------------------------------------
+# MAIN
+# --------------------------------------------------
 
 st.title("🚀 AI Enabled Workforce & Capacity Planning")
 
+st.markdown("""
+Forecast workforce requirement based on:
+
+- Breakdown Maintenance
+- Preventive Maintenance
+- Startup & Commissioning
+- BAU Growth
+- Data Center Surge
+- Attrition Impact
+""")
+
 uploaded_file = st.file_uploader(
-    "Upload Workforce Input CSV",
+    "Upload workforce_input.csv",
     type=["csv"]
 )
 
-if uploaded_file is not None:
+if uploaded_file:
 
     df = pd.read_csv(uploaded_file)
 
-    st.subheader("📋 Input Data")
-    st.dataframe(df, use_container_width=True)
+    st.subheader("Input Data")
+
+    st.dataframe(
+        df,
+        use_container_width=True
+    )
 
     result = calculate_workforce(
         df,
-        bau_growth,
-        dc_growth,
-        attrition
+        bu_parameters
     )
 
-    st.subheader("📊 Workforce Planning Results")
-    st.dataframe(result, use_container_width=True)
+    st.subheader("Workforce Planning Results")
 
-    # KPI Metrics
+    st.dataframe(
+        result,
+        use_container_width=True
+    )
+
+    # KPI SECTION
+
     total_current = df["Current_SE"].sum()
 
     total_available = round(
-        total_current * (1 - attrition / 100),
+        result["Available Engineers"].sum(),
         1
     )
 
@@ -80,17 +121,35 @@ if uploaded_file is not None:
         1
     )
 
-    total_hiring = result["Additional Required"].sum()
+    total_hiring = int(
+        result["Additional Required"].sum()
+    )
 
     c1, c2, c3, c4 = st.columns(4)
 
-    c1.metric("Current Engineers", total_current)
-    c2.metric("Available After Attrition", total_available)
-    c3.metric("Required Engineers", total_required)
-    c4.metric("Hiring Gap", total_hiring)
+    c1.metric(
+        "Current Engineers",
+        total_current
+    )
 
-    # Product Summary
-    st.subheader("📦 Hiring by Product")
+    c2.metric(
+        "Available After Attrition",
+        total_available
+    )
+
+    c3.metric(
+        "Required Engineers",
+        total_required
+    )
+
+    c4.metric(
+        "Additional Hiring Required",
+        total_hiring
+    )
+
+    # PRODUCT SUMMARY
+
+    st.subheader("📦 Hiring Requirement by BU")
 
     product_summary = (
         result.groupby("Product")
@@ -100,8 +159,9 @@ if uploaded_file is not None:
 
     st.bar_chart(product_summary)
 
-    # Region Summary
-    st.subheader("🌍 Hiring by Region")
+    # REGION SUMMARY
+
+    st.subheader("🌍 Hiring Requirement by Region")
 
     region_summary = (
         result.groupby("Region")
@@ -111,8 +171,9 @@ if uploaded_file is not None:
 
     st.bar_chart(region_summary)
 
-    # Product vs Region Matrix
-    st.subheader("📈 Product vs Region Matrix")
+    # MATRIX
+
+    st.subheader("📊 Product vs Region Hiring Matrix")
 
     pivot = result.pivot_table(
         values="Additional Required",
@@ -122,20 +183,26 @@ if uploaded_file is not None:
         fill_value=0
     )
 
-    st.dataframe(pivot)
+    st.dataframe(
+        pivot,
+        use_container_width=True
+    )
 
-    # Download
-    csv = result.to_csv(index=False).encode("utf-8")
+    # DOWNLOAD
+
+    csv = result.to_csv(
+        index=False
+    ).encode("utf-8")
 
     st.download_button(
-        label="⬇ Download Results",
-        data=csv,
-        file_name="workforce_forecast.csv",
-        mime="text/csv"
+        "⬇ Download Results",
+        csv,
+        "workforce_forecast.csv",
+        "text/csv"
     )
 
 else:
 
     st.info(
-        "Upload a workforce_input.csv file to begin analysis."
+        "Upload workforce_input.csv to start analysis."
     )
